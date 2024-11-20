@@ -49,7 +49,7 @@ public extension NetworkConnectivityKit {
     /// Test connectivity using a single method.
     /// - Parameter method: ConnectivityMethod. Default is `appleCaptive`.
     /// - Returns: `true` if the method succeeds, `false` otherwise.
-    static func checkConnectivity(using method: ConnectivityMethod = .appleCaptive) async -> Bool {
+    static func checkConnectivity(using method: ConnectivityMethod) async -> Bool {
         let success = await method.performRequest()
         return success
     }
