@@ -12,10 +12,10 @@ import Foundation
 #error("NetworkConnectivityKit doesn't support Swift versions below 5.9.")
 #endif
 
-/// Current NetworkConnectivityKit version 0.0.1. Necessary since SPM doesn't use dynamic libraries. Plus this will be more accurate.
-let version = "0.0.1"
+/// Current NetworkConnectivityKit version 0.0.2. Necessary since SPM doesn't use dynamic libraries. Plus this will be more accurate.
+let version = "0.0.2"
 
-public enum NetworkConnectivityKit {}
+public enum NetworkConnectivityKit: Sendable {}
 
 public extension NetworkConnectivityKit {
     /// Test connectivity using multiple methods.
@@ -58,10 +58,10 @@ public extension NetworkConnectivityKit {
 // MARK: - ConnectivityValidation
 
 public extension NetworkConnectivityKit {
-    struct ConnectivityValidation {
-        public typealias Validation = (URL, HTTPURLResponse, Data) -> Bool
+    struct ConnectivityValidation: Sendable {
+        public typealias Validation = @Sendable (URL, HTTPURLResponse, Data) -> Bool
 
-        var validation: Validation
+        let validation: Validation
 
         public init(validation: @escaping Validation) {
             self.validation = validation
@@ -86,7 +86,7 @@ public extension NetworkConnectivityKit {
 // MARK: - ConnectivityMethod
 
 public extension NetworkConnectivityKit {
-    enum ConnectivityMethod {
+    enum ConnectivityMethod: Sendable {
         case appleCaptive
         case appleLibrary
         case googleGstatic
