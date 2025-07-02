@@ -8,15 +8,20 @@
 import Foundation
 
 // Enforce minimum Swift version for all platforms and build systems.
-#if swift(<5.9)
-#error("NetworkConnectivityKit doesn't support Swift versions below 5.9.")
+#if swift(<5.10)
+    #error("NetworkConnectivityKit doesn't support Swift versions below 5.10.")
 #endif
 
-/// Current NetworkConnectivityKit version 1.0.0. Necessary since SPM doesn't use dynamic libraries. Plus this will be more accurate.
-let version = "1.0.0"
+/// Current NetworkConnectivityKit version 1.1.0. Necessary since SPM doesn't use dynamic libraries. Plus this will be more accurate.
+let version = "1.1.0"
 
 // MARK: - NetworkConnectivityKit Namespace
 
+/// A lightweight Swift library for testing network connectivity using multiple validation methods.
+///
+/// NetworkConnectivityKit provides a reliable way to check internet connectivity by attempting
+/// connections to various well-known endpoints. It supports concurrent testing of multiple
+/// endpoints and returns as soon as any connection succeeds.
 public enum NetworkConnectivityKit: Sendable {}
 
 // MARK: - Connectivity Public API
