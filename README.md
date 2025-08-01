@@ -183,10 +183,6 @@ NetworkConnectivityKit is designed for minimal performance impact:
 
 NetworkConnectivityKit is available under the MIT license. See the [LICENSE](LICENSE) file for more info.
 
-## Credits
-
-Created and maintained by [CodingIran](https://github.com/iranqiu).
-
 ## Support
 
 - 📧 Email: <codingiran@gmail.com>
