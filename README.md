@@ -190,4 +190,4 @@ Created and maintained by [CodingIran](https://github.com/iranqiu).
 ## Support
 
 - 📧 Email: <codingiran@gmail.com>
-- 🐛 Issues: [GitHub Issues](https://https://github.com/codingiran/NetworkConnectivityKit/issues)
+- 🐦 Twitter: [@codingiran](https://x.com/Iran_Qiu)
