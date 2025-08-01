@@ -17,22 +17,12 @@ Traditional reachability APIs only check if a network interface is available, bu
 
 NetworkConnectivityKit solves these problems by making real HTTP requests to reliable endpoints and validating the responses, giving you confidence that your app can actually reach the internet.
 
-## Features
-
-✅ **Real connectivity testing** - Makes actual HTTP requests, not just interface checks  
-✅ **Concurrent testing** - Tests multiple endpoints simultaneously for faster results  
-✅ **Captive portal detection** - Identifies networks that require authentication  
-✅ **Customizable validation** - Define your own endpoints and validation logic  
-✅ **Built-in endpoint collection** - Includes endpoints from Apple, Google, Cloudflare, and more  
-✅ **Swift concurrency** - Full async/await support with structured concurrency  
-✅ **Minimal overhead** - Lightweight requests with configurable timeouts  
-✅ **Cross-platform** - Works on iOS, macOS, tvOS, watchOS, and visionOS  
-✅ **Compile-time safety** - StaticString URLs for guaranteed valid endpoints  
-✅ **Type-safe API** - Non-optional built-in methods eliminate runtime errors
+> **Need monitor system network reachability and information?**
+Check out [NetworkPathMonitor](https://github.com/codingiran/NetworkPathMonitor) - A modern, type-safe, network path monitoring utility for Apple platforms using Swift Concurrency.
 
 ## Requirements
 
-- Swift 5.10+ (Swift 6.0+ for latest features)
+- Swift 5.10+
 - iOS 13.0+ / macOS 10.15+ / tvOS 13.0+ / watchOS 6.0+ / visionOS 1.0+
 
 ## Installation
@@ -52,15 +42,6 @@ Then import the module:
 ```swift
 import NetworkConnectivityKit
 ```
-
-#### Swift Version Compatibility
-
-NetworkConnectivityKit supports multiple Swift versions:
-
-- **Swift 5.10+**: Fully supported with all features
-- **Swift 6.0+**: Enhanced with strict concurrency checking and latest language features
-
-The package automatically selects the appropriate configuration based on your project's Swift version.
 
 ## Quick Start
 
@@ -187,163 +168,6 @@ NetworkConnectivityKit includes several well-tested endpoints (all non-optional 
 | `.vivoWifi` | `http://wifi.vivo.com.cn/generate_204` | HTTP 204 | Vivo WiFi connectivity check |
 | `.miuiConnect` | `http://connect.rom.miui.com/generate_204` | HTTP 204 | MIUI connectivity check |
 
-## API Design & Type Safety
-
-### StaticString vs String URLs
-
-NetworkConnectivityKit provides two ways to create connectivity methods:
-
-```swift
-// ✅ StaticString (Recommended for hardcoded URLs)
-// - Compile-time validation
-// - Non-optional result  
-// - Crashes early if URL is invalid (fail-fast principle)
-let method1 = NetworkConnectivityKit.ConnectivityMethod(
-    staticURLString: "http://www.gstatic.com/generate_204",
-    validation: .generate204Validation
-)
-
-// ✅ String (For dynamic URLs)
-// - Runtime validation
-// - Optional result (returns nil for invalid URLs)
-// - Graceful handling of invalid URLs
-let method2 = NetworkConnectivityKit.ConnectivityMethod(
-    urlString: userProvidedURL,
-    validation: .generate200Validation
-)
-```
-
-### Built-in Methods Are Non-Optional
-
-```swift
-// ❌ Old pattern (no longer needed)
-guard let method = NetworkConnectivityKit.ConnectivityMethod.appleCaptive else {
-    // Handle nil case
-    return
-}
-let result = await NetworkConnectivityKit.checkConnectivity(using: method)
-
-// ✅ New pattern (direct usage)
-let result = await NetworkConnectivityKit.checkConnectivity(using: .appleCaptive)
-```
-
-## How It Works
-
-1. **Concurrent Requests**: When testing multiple endpoints, NetworkConnectivityKit makes requests concurrently
-2. **Early Success**: Returns `true` as soon as any endpoint responds successfully
-3. **Automatic Cancellation**: Cancels remaining requests once success is detected
-4. **Validation Logic**: Each endpoint has specific validation rules (status codes, content checks)
-5. **Timeout Protection**: Configurable timeouts prevent hanging requests
-6. **Cache Avoidance**: Ignores cached responses by default for accurate real-time results
-7. **Compile-time Safety**: StaticString URLs ensure built-in endpoints are always valid
-
-## Error Handling
-
-NetworkConnectivityKit handles network errors gracefully:
-
-```swift
-// The method returns false for any network errors, timeouts, or validation failures
-let isConnected = await NetworkConnectivityKit.checkConnectivity()
-
-// For custom error handling, you can create your own validation logic
-let customValidation = NetworkConnectivityKit.ConnectivityValidation { request, response, data in
-    // Custom logic here - return false to indicate connectivity failure
-    guard response.statusCode == 200 else { return false }
-    // Additional checks...
-    return true
-}
-
-// StaticString version for compile-time safety
-let safeMethod = NetworkConnectivityKit.ConnectivityMethod(
-    staticURLString: "https://api.example.com/health",
-    validation: customValidation
-)
-```
-
-## Best Practices
-
-### Performance Optimization
-
-```swift
-// Use default endpoints for general connectivity testing
-let isConnected = await NetworkConnectivityKit.checkConnectivity()
-
-// For faster results, test fewer endpoints
-let quickCheck = await NetworkConnectivityKit.checkConnectivity(using: [.googleGstatic])
-
-// For maximum reliability, use all endpoints
-let reliableCheck = await NetworkConnectivityKit.checkConnectivity(using: .allDefault)
-```
-
-### App Integration
-
-```swift
-class ConnectivityManager {
-    func checkConnectivity() async -> Bool {
-        await NetworkConnectivityKit.checkConnectivity()
-    }
-    
-    func performNetworkOperation() async throws {
-        guard await checkConnectivity() else {
-            throw NetworkError.noConnectivity
-        }
-        
-        // Proceed with network operation
-    }
-    
-    // Use StaticString for compile-time safety with known URLs
-    func checkSpecificEndpoint() async -> Bool {
-        let customMethod = NetworkConnectivityKit.ConnectivityMethod(
-            staticURLString: "https://api.myapp.com/health",
-            validation: .generate200Validation
-        )
-        
-        return await NetworkConnectivityKit.checkConnectivity(using: customMethod)
-    }
-}
-```
-
-### URL Safety Guidelines
-
-```swift
-// ✅ Use StaticString for known, hardcoded URLs
-let staticMethod = NetworkConnectivityKit.ConnectivityMethod(
-    staticURLString: "http://www.gstatic.com/generate_204",
-    validation: .generate204Validation
-)
-
-// ✅ Use String initializer for user input or dynamic URLs
-func createMethodFromUserInput(_ url: String) -> NetworkConnectivityKit.ConnectivityMethod? {
-    return NetworkConnectivityKit.ConnectivityMethod(
-        urlString: url,
-        validation: .generate200Validation
-    )
-}
-
-// ✅ Built-in methods are always safe to use directly
-let result = await NetworkConnectivityKit.checkConnectivity(using: .appleCaptive)
-```
-
-## Sample Projects
-
-Check out the [Examples](Examples/) directory for complete sample projects showing:
-
-- Basic connectivity checking
-- Custom endpoint configuration
-- Integration with SwiftUI
-- Background connectivity monitoring
-- StaticString vs String URL usage patterns
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
 ## Performance
 
 NetworkConnectivityKit is designed for minimal performance impact:
@@ -366,5 +190,4 @@ Created and maintained by [CodingIran](https://github.com/iranqiu).
 ## Support
 
 - 📧 Email: <codingiran@gmail.com>
-- 🐛 Issues: [GitHub Issues](https://github.com/iranqiu/NetworkConnectivityKit/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/iranqiu/NetworkConnectivityKit/discussions)
+- 🐛 Issues: [GitHub Issues](https://https://github.com/codingiran/NetworkConnectivityKit/issues)
